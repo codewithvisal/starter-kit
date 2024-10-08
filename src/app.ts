@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import passport from './configs/passport';
 import authRoutes from "./routes/auth.routes";
 import { errorHandler } from './utils/error';
 
@@ -13,6 +14,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
