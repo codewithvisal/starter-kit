@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Logs
+logs
+*.log
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# IDE and Editor folders
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+coverage/
+
+# Temporary files
+tmp/
+temp/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.cache/
+.project
+.settings/
+*.tmp
+*.bak
+*.swp
+
+# Optional: Database files (if you're using a local database)
+*.sqlite
+
+# Optional: Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Optional: Dependency directories
+jspm_packages/
+
+# Optional: TypeScript cache
+*.tsbuildinfo
+
+# Optional: Next.js build output
+.next
+
+# Optional: Nuxt.js build output
+.nuxt
+
+# Optional: Gatsby files
+.cache/
+public
+
+# Optional: VuePress build output
+.vuepress/dist
+
+# Optional: Serverless directories
+.serverless/
+
+# Optional: FuseBox cache
+.fusebox/
+
+# Optional: DynamoDB Local files
+.dynamodb/
