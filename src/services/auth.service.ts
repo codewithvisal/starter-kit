@@ -9,8 +9,11 @@ if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined in the environment variables');
 }
 
+// Add this type to exclude password from User
+type UserWithoutPassword = Omit<User, 'password'>;
+
 export const authService = {
-  async register(email: string, password: string, role: Role = Role.USER) {
+  async register(email: string, password: string, role: Role = Role.USER): Promise<UserWithoutPassword> {
     const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) {
       throw new AppError('User already exists', 400);
@@ -21,10 +24,11 @@ export const authService = {
       data: { email, password: hashedPassword, role },
     });
 
-    return { id: user.id, email: user.email, role: user.role };
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   },
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<{ token: string; user: UserWithoutPassword }> {
     const user = await db.user.findUnique({ where: { email } });
     if (!user) {
       throw new AppError('Invalid credentials', 401);
@@ -41,13 +45,18 @@ export const authService = {
     }
 
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-    return { token, user: { id: user.id, email: user.email, role: user.role } };
+    const { password: _, ...userWithoutPassword } = user;
+    return { token, user: userWithoutPassword };
   },
 
-  async verifyToken(token: string): Promise<Express.User> {
+  async verifyToken(token: string): Promise<User> {
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string, role: Role };
-      return { userId: decoded.userId, role: decoded.role };
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string; role: Role };
+      const user = await this.findUserById(decoded.userId);
+      if (!user) {
+        throw new AppError('User not found', 404);
+      }
+      return user;
     } catch (error) {
       throw new AppError('Invalid token', 401);
     }
@@ -64,12 +73,10 @@ export const authService = {
       throw new AppError('No email found in Google profile', 400);
     }
 
-    // Check if a user with this email already exists
     const userWithEmail = await db.user.findUnique({ where: { email } });
     if (userWithEmail) {
-      // If the user exists but doesn't have a googleId, update it
       if (!userWithEmail.googleId) {
-        return db.user.update({
+        return await db.user.update({
           where: { id: userWithEmail.id },
           data: { googleId: profile.id }
         });
@@ -77,8 +84,7 @@ export const authService = {
       return userWithEmail;
     }
 
-    // Create a new user if one doesn't exist
-    const newUser = await db.user.create({
+    return await db.user.create({
       data: {
         email,
         googleId: profile.id,
@@ -86,11 +92,9 @@ export const authService = {
         role: Role.USER,
       },
     });
-
-    return newUser;
   },
 
   async findUserById(id: string): Promise<User | null> {
-    return db.user.findUnique({ where: { id } });
+    return await db.user.findUnique({ where: { id } });
   },
 };

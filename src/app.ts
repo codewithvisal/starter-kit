@@ -6,7 +6,7 @@ import authRoutes from "./routes/auth.routes";
 import propertyTypeRoutes from "./routes/property-type.routes";
 import amenityRoutes from './routes/amenity.routes';
 import propertyRoutes from './routes/property.routes';
-
+import bookingRoutes from './routes/booking.routes';
 import { errorHandler } from './utils/error';
 
 const app = express();
@@ -25,7 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/v1/property-types', propertyTypeRoutes);
 app.use('/api/v1/amenities', amenityRoutes);
 app.use('/api/v1/properties', propertyRoutes);
-
+app.use('/api/v1/bookings', bookingRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello World" });

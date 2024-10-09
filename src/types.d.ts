@@ -1,14 +1,8 @@
-import { Role } from '@prisma/client';
+import { Request } from 'express';
+import { User as PrismaUser, Role } from '@prisma/client';
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: AuthenticatedUser;
-    }
-  }
+export interface AuthenticatedRequest extends Request {
+  user: PrismaUser & { role: Role };
 }
 
-export interface AuthenticatedUser {
-  userId: string;
-  role: Role;
-}
+export {};
