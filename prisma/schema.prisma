@@ -26,6 +26,157 @@ model User {
   role          Role     @default(USER)
   googleId      String?  @unique
   displayName   String?
+  profileImage  String?
+  bio           String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  
+  properties    Property[]
+  bookings      Booking[]
+  reviews       Review[]
+  
+  sentMessages            Message[]
+  conversationParticipant ConversationParticipant[]
+}
+
+model Property {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  price           Float
+  address         String
+  city            String
+  state           String
+  country         String
+  zipCode         String
+  latitude        Float?
+  longitude       Float?
+  bedrooms        Int
+  bathrooms       Int
+  maxGuests       Int
+  imageUrl        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  owner           User     @relation(fields: [ownerId], references: [id])
+  ownerId         String
+  propertyType    PropertyType @relation(fields: [propertyTypeId], references: [id])
+  propertyTypeId  String
+  amenities       PropertyAmenity[]
+  bookings        Booking[]
+  reviews         Review[]
+  availabilities  Availability[]
+  
+  conversations Conversation[]
+}
+
+model PropertyType {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  properties  Property[]
+}
+
+model Amenity {
+  id          String   @id @default(cuid())
+  name        String
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  properties  PropertyAmenity[]
+}
+
+model PropertyAmenity {
+  property    Property @relation(fields: [propertyId], references: [id])
+  propertyId  String
+  amenity     Amenity  @relation(fields: [amenityId], references: [id])
+  amenityId   String
+
+  @@id([propertyId, amenityId])
+}
+
+model Booking {
+  id          String   @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  totalPrice  Float
+  status      BookingStatus
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  guest       User     @relation(fields: [guestId], references: [id])
+  guestId     String
+  property    Property @relation(fields: [propertyId], references: [id])
+  propertyId  String
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int
+  comment     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  guest       User     @relation(fields: [guestId], references: [id])
+  guestId     String
+  property    Property @relation(fields: [propertyId], references: [id])
+  propertyId  String
+}
+
+model Availability {
+  id          String   @id @default(cuid())
+  date        DateTime
+  isAvailable Boolean
+  price       Float?
+
+  property    Property @relation(fields: [propertyId], references: [id])
+  propertyId  String
+
+  @@unique([propertyId, date])
+}
+
+model Conversation {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  participants  ConversationParticipant[]
+  messages      Message[]
+  property      Property? @relation(fields: [propertyId], references: [id])
+  propertyId    String?
+}
+
+model ConversationParticipant {
+  id              String       @id @default(cuid())
+  user            User         @relation(fields: [userId], references: [id])
+  userId          String
+  conversation    Conversation @relation(fields: [conversationId], references: [id])
+  conversationId  String
+  lastReadAt      DateTime?
+
+  @@unique([userId, conversationId])
+}
+
+model Message {
+  id              String       @id @default(cuid())
+  content         String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  sender          User         @relation(fields: [senderId], references: [id])
+  senderId        String
+  conversation    Conversation @relation(fields: [conversationId], references: [id])
+  conversationId  String
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }

@@ -3,6 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from './configs/passport';
 import authRoutes from "./routes/auth.routes";
+import propertyTypeRoutes from "./routes/property-type.routes";
+import amenityRoutes from './routes/amenity.routes';
+
 import { errorHandler } from './utils/error';
 
 const app = express();
@@ -16,8 +19,10 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(passport.initialize());
 
-// Routes
+// API v1 Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/v1/property-types', propertyTypeRoutes);
+app.use('/api/v1/amenities', amenityRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Hello World" });
