@@ -24,7 +24,8 @@ export const login = async (req: LoginRequest, res: Response, next: NextFunction
     res.cookie('token', token, { 
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      sameSite: 'strict',
+      maxAge: 3600000 // 1 hour in milliseconds
     });
     res.status(200).json({ message: 'Logged in successfully', user });
   } catch (error) {

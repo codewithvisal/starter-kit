@@ -56,12 +56,15 @@ export const bookingService = {
       throw new AppError('Property not found', 404);
     }
 
-    const totalPrice = property.price * availability.length;
+    const totalPrice = property.basePrice * availability.length;
 
     // Create booking
     const booking = await db.booking.create({
       data: {
-        ...data,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        propertyId,
+        guestId,
         status: BookingStatus.PENDING,
         totalPrice,
       },
@@ -82,6 +85,7 @@ export const bookingService = {
       },
       data: {
         isAvailable: false,
+        bookingId: booking.id, // Add this line to link availabilities to the booking
       },
     });
 
@@ -124,6 +128,7 @@ export const bookingService = {
         },
         data: {
           isAvailable: true,
+          bookingId: null, // Remove the booking association
         },
       });
 

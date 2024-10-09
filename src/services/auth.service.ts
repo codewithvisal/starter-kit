@@ -58,6 +58,7 @@ export const authService = {
       }
       return user;
     } catch (error) {
+      console.error('Token verification error:', error);
       throw new AppError('Invalid token', 401);
     }
   },

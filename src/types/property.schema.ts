@@ -4,7 +4,7 @@ export const createPropertySchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().min(1, 'Description is required'),
-    price: z.number().positive('Price must be positive'),
+    basePrice: z.number().positive('Base price must be positive'),
     address: z.string().min(1, 'Address is required'),
     city: z.string().min(1, 'City is required'),
     state: z.string().min(1, 'State is required'),
@@ -17,7 +17,6 @@ export const createPropertySchema = z.object({
     maxGuests: z.number().int().positive('Max guests must be a positive integer'),
     imageUrl: z.string().url().optional(),
     propertyTypeId: z.string().min(1, 'Property type is required'),
-    ownerId: z.string().min(1, 'Owner is required'),
     amenityIds: z.array(z.string()).optional(),
   }),
 });
@@ -26,7 +25,7 @@ export const updatePropertySchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Name is required').optional(),
     description: z.string().min(1, 'Description is required').optional(),
-    price: z.number().positive('Price must be positive').optional(),
+    basePrice: z.number().positive('Base price must be positive').optional(),
     address: z.string().min(1, 'Address is required').optional(),
     city: z.string().min(1, 'City is required').optional(),
     state: z.string().min(1, 'State is required').optional(),

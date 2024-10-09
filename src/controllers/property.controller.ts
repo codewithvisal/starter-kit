@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { AppError } from '../utils/error';
 import { propertyService } from '../services/property.service';
+import { AuthenticatedRequest } from '../types';
 
 export const propertyController = {
   async getAllProperties(req: Request, res: Response) {
@@ -33,9 +34,13 @@ export const propertyController = {
     }
   },
 
-  async createProperty(req: Request, res: Response) {
+  async createProperty(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-      const property = await propertyService.createProperty(req.body);
+      const propertyData = {
+        ...req.body,
+        ownerId: req.user!.id, // Set the ownerId to the authenticated user's id
+      };
+      const property = await propertyService.createProperty(propertyData);
       res.status(201).json(property);
     } catch (error) {
       if (error instanceof AppError) {
@@ -46,9 +51,19 @@ export const propertyController = {
     }
   },
 
-  async updateProperty(req: Request, res: Response) {
+  async updateProperty(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      const property = await propertyService.getPropertyById(id);
+      if (!property) {
+        throw new AppError('Property not found', 404);
+      }
+      
+      // Check if the user is the owner of the property or an admin
+      if (property.ownerId !== req.user!.id && req.user!.role !== 'ADMIN') {
+        throw new AppError('Unauthorized', 403);
+      }
+
       const updatedProperty = await propertyService.updateProperty(id, req.body);
       if (!updatedProperty) {
         throw new AppError('Property not found', 404);
@@ -63,9 +78,19 @@ export const propertyController = {
     }
   },
 
-  async deleteProperty(req: Request, res: Response) {
+  async deleteProperty(req: AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      const property = await propertyService.getPropertyById(id);
+      if (!property) {
+        throw new AppError('Property not found', 404);
+      }
+      
+      // Check if the user is the owner of the property or an admin
+      if (property.ownerId !== req.user!.id && req.user!.role !== 'ADMIN') {
+        throw new AppError('Unauthorized', 403);
+      }
+
       await propertyService.deleteProperty(id);
       res.status(204).send();
     } catch (error) {

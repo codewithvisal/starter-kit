@@ -43,7 +43,7 @@ model Property {
   id              String   @id @default(cuid())
   name            String
   description     String
-  price           Float
+  basePrice       Float    // Changed from 'price' to 'basePrice'
   address         String
   city            String
   state           String
@@ -67,7 +67,7 @@ model Property {
   reviews         Review[]
   availabilities  Availability[]
   
-  conversations Conversation[]
+  conversations   Conversation[]
 }
 
 model PropertyType {
@@ -113,6 +113,9 @@ model Booking {
   guestId     String
   property    Property @relation(fields: [propertyId], references: [id])
   propertyId  String
+
+  // New relation to Availability
+  bookedDates Availability[]
 }
 
 model Review {
@@ -132,10 +135,14 @@ model Availability {
   id          String   @id @default(cuid())
   date        DateTime
   isAvailable Boolean
-  price       Float?
+  price       Float?   // This can be different from the base price
 
   property    Property @relation(fields: [propertyId], references: [id])
   propertyId  String
+
+  // New relation to Booking
+  booking     Booking?  @relation(fields: [bookingId], references: [id])
+  bookingId   String?
 
   @@unique([propertyId, date])
 }

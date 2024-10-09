@@ -6,6 +6,7 @@ export const propertyService = {
   async getAllProperties(): Promise<Property[]> {
     return db.property.findMany({
       include: {
+        owner: true,
         propertyType: true,
         amenities: {
           include: {
@@ -20,6 +21,7 @@ export const propertyService = {
     return db.property.findUnique({
       where: { id },
       include: {
+        owner: true,
         propertyType: true,
         amenities: {
           include: {
@@ -40,6 +42,7 @@ export const propertyService = {
         },
       },
       include: {
+        owner: true,
         propertyType: true,
         amenities: {
           include: {
@@ -63,6 +66,7 @@ export const propertyService = {
           } : undefined,
         },
         include: {
+          owner: true,
           propertyType: true,
           amenities: {
             include: {
